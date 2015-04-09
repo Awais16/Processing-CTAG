@@ -3,7 +3,6 @@ Animation birdyAnim;
 
 void setup() {
   size(640, 360);
-  
   flock = new Flock();
   birdyAnim= new Animation();
   // Add an initial set of boids into the system
@@ -13,7 +12,7 @@ void setup() {
 }
 
 void draw() {
-  background(50);
+  background(205);
   flock.run();
 }
 
