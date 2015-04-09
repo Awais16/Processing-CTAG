@@ -1,8 +1,11 @@
 Flock flock;
+Animation birdyAnim;
 
 void setup() {
   size(640, 360);
+  
   flock = new Flock();
+  birdyAnim= new Animation();
   // Add an initial set of boids into the system
   for (int i = 0; i < 150; i++) {
     flock.addBoid(new Boid(width/2,height/2));
@@ -144,6 +147,9 @@ class Boid {
     vertex(r, r*2);
     endShape();
     popMatrix();
+    
+    birdyAnim.display(location.x,location.y);
+    
   }
 
   // Wraparound
@@ -245,4 +251,27 @@ class Boid {
       return new PVector(0, 0);
     }
   }
+}
+
+//adding animation class
+class Animation {
+  PImage[] images;
+  int imageCount;
+  int frame;
+  
+  Animation() {
+    imageCount = 3;
+    images = new PImage[3];
+    PImage animalSprite = loadImage("bird.png");
+    images[0]=animalSprite.get(11,6, 10, 5);
+    images[1]=animalSprite.get(43,6, 10, 5);
+    images[2]=animalSprite.get(75,6, 10, 5);
+    imageMode(CENTER);
+  }
+
+  void display(float xpos, float ypos) {
+    frame = (frame+1) % imageCount;
+    image(images[frame], xpos,ypos);
+  }
+  
 }
