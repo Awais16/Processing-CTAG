@@ -136,7 +136,7 @@ class Boid {
     float theta = velocity.heading2D() + radians(90);
     // heading2D() above is now heading() but leaving old syntax until Processing.js catches up
     
-    fill(200, 100);
+    /*fill(200, 100);
     stroke(255);
     pushMatrix();
     translate(location.x, location.y);
@@ -147,8 +147,8 @@ class Boid {
     vertex(r, r*2);
     endShape();
     popMatrix();
-    
-    birdyAnim.display(location.x,location.y);
+    */
+    birdyAnim.display(location.x,location.y,theta);
     
   }
 
@@ -262,16 +262,21 @@ class Animation {
   Animation() {
     imageCount = 3;
     images = new PImage[3];
-    PImage animalSprite = loadImage("bird.png");
+    PImage animalSprite = loadImage("bird.png"); //created online from piskel
     images[0]=animalSprite.get(11,6, 10, 5);
     images[1]=animalSprite.get(43,6, 10, 5);
     images[2]=animalSprite.get(75,6, 10, 5);
     imageMode(CENTER);
   }
 
-  void display(float xpos, float ypos) {
+  void display(float xpos, float ypos, float theta) {
     frame = (frame+1) % imageCount;
-    image(images[frame], xpos,ypos);
+    pushMatrix();
+    //translate and rotate to give direction to the image.
+    translate(xpos,ypos);
+    rotate(theta);
+    image(images[frame], 0,0);
+    popMatrix();
   }
   
 }
