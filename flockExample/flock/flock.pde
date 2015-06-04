@@ -1,26 +1,59 @@
 Flock flock;
 Animation birdyAnim;
+PImage bgImg,flower1,flower2;
+ArrayList<Flower> flowers;
 
 void setup() {
-  size(640, 360);
+  size(1024,768); //size of bgImage should of equal to this
   flock = new Flock();
+  bgImg= loadImage("bg1.jpg");
+  flower1= loadImage("Flower01.png");
+  flower2= loadImage("Flower02.png");
+  
+  flowers=new ArrayList<Flower>(); //list of add flowers
+  
   birdyAnim= new Animation();
   // Add an initial set of boids into the system
-  for (int i = 0; i < 150; i++) {
+  for (int i = 0; i < 5; i++) {
     flock.addBoid(new Boid(width/2,height/2));
   }
 }
 
 void draw() {
-  background(205);
+  background(bgImg);
+  
+  //draw flowers
+  for (Flower flo : flowers) {
+      flo.draw();
+    }
+  
   flock.run();
 }
 
 // Add a new boid into the System
 void mousePressed() {
-  flock.addBoid(new Boid(mouseX,mouseY));
+  if (mouseButton == RIGHT){
+    addFlower();
+  }else{
+    flock.addBoid(new Boid(mouseX,mouseY));  
+  }
+  
 }
 
+void addFlower(){
+    Flower fl= new Flower();
+    
+    if(int(random(0,3))==1){
+      
+      fl.flower=flower1;
+    }else{
+      fl.flower=flower2;
+    }
+    fl.x=mouseX;
+    fl.y=mouseY;
+    
+    flowers.add(fl);  
+}
 
 
 // The Flock (a list of Boid objects)
@@ -92,7 +125,7 @@ class Boid {
     PVector ali = align(boids);      // Alignment
     PVector coh = cohesion(boids);   // Cohesion
     // Arbitrarily weight these forces
-    sep.mult(1.5);
+    sep.mult(1.7);
     ali.mult(1.0);
     coh.mult(1.0);
     // Add the force vectors to acceleration
@@ -261,10 +294,14 @@ class Animation {
   Animation() {
     imageCount = 3;
     images = new PImage[3];
-    PImage animalSprite = loadImage("bird.png"); //created online from piskel
+    /*PImage animalSprite = loadImage("bird.png"); //created online from piskel
     images[0]=animalSprite.get(11,6, 10, 5);
     images[1]=animalSprite.get(43,6, 10, 5);
-    images[2]=animalSprite.get(75,6, 10, 5);
+    images[2]=animalSprite.get(75,6, 10, 5);*/
+    images[0]= loadImage("Bee up.png");
+    images[1]= loadImage("Bee normal.png");
+    images[2]= loadImage("Bee down.png");
+    
     imageMode(CENTER);
   }
 
@@ -278,4 +315,15 @@ class Animation {
     popMatrix();
   }
   
-}
+} //class Animation
+
+
+class Flower{
+  PImage flower;
+  int x;
+  int y;
+  
+  void draw(){
+   image(flower,x,y); 
+  }
+}//class Flower
