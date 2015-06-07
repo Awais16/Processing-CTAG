@@ -1,21 +1,27 @@
 Flock flock;
-Animation birdyAnim;
 PImage bgImg,flower1,flower2;
 ArrayList<Flower> flowers;
+ArrayList<PImage> bSprite;
 
 void setup() {
   size(1024,768); //size of bgImage should of equal to this
   flock = new Flock();
+  
   bgImg= loadImage("bg1.jpg");
   flower1= loadImage("Flower01.png");
   flower2= loadImage("Flower02.png");
   
-  flowers=new ArrayList<Flower>(); //list of add flowers
+  bSprite=new ArrayList<PImage>();
+  bSprite.add(loadImage("Bee up.png"));
+  bSprite.add(loadImage("Bee normal.png"));
+  bSprite.add(loadImage("Bee down.png"));
   
-  birdyAnim= new Animation();
+  flowers=new ArrayList<Flower>(); //list of add flowers
+ 
+  
   // Add an initial set of boids into the system
-  for (int i = 0; i < 5; i++) {
-    flock.addBoid(new Boid(width/2,height/2));
+  for (int i = 0; i <1 ; i++) {
+    flock.addBoid(new Boid(width/2,height/2,bSprite));
   }
 }
 
@@ -35,7 +41,7 @@ void mousePressed() {
   if (mouseButton == RIGHT){
     addFlower();
   }else{
-    flock.addBoid(new Boid(mouseX,mouseY));  
+    flock.addBoid(new Boid(mouseX,mouseY,bSprite));  
   }
   
 }
@@ -90,8 +96,12 @@ class Boid {
   float r;
   float maxforce;    // Maximum steering force
   float maxspeed;    // Maximum speed
+  
+  //for animation
+  ArrayList<PImage> spriteImages;
+  int spriteFrame;
 
-    Boid(float x, float y) {
+    Boid(float x, float y, ArrayList<PImage> sprite) {
     acceleration = new PVector(0, 0);
 
     // This is a new PVector method not yet implemented in JS
@@ -105,6 +115,9 @@ class Boid {
     r = 2.0;
     maxspeed = 2;
     maxforce = 0.03;
+    
+    spriteImages=sprite;
+    spriteFrame=0;
   }
 
   void run(ArrayList<Boid> boids) {
@@ -125,7 +138,7 @@ class Boid {
     PVector ali = align(boids);      // Alignment
     PVector coh = cohesion(boids);   // Cohesion
     // Arbitrarily weight these forces
-    sep.mult(1.7);
+    sep.mult(2.3);
     ali.mult(1.0);
     coh.mult(1.0);
     // Add the force vectors to acceleration
@@ -180,7 +193,8 @@ class Boid {
     endShape();
     popMatrix();
     */
-    birdyAnim.display(location.x,location.y,theta);
+    
+    animate(theta);
     
   }
 
@@ -283,39 +297,23 @@ class Boid {
       return new PVector(0, 0);
     }
   }
-}
-
-//adding animation class
-class Animation {
-  PImage[] images;
-  int imageCount;
-  int frame;
   
-  Animation() {
-    imageCount = 3;
-    images = new PImage[3];
-    /*PImage animalSprite = loadImage("bird.png"); //created online from piskel
-    images[0]=animalSprite.get(11,6, 10, 5);
-    images[1]=animalSprite.get(43,6, 10, 5);
-    images[2]=animalSprite.get(75,6, 10, 5);*/
-    images[0]= loadImage("Bee up.png");
-    images[1]= loadImage("Bee normal.png");
-    images[2]= loadImage("Bee down.png");
+  
+  //functions animation  
+  void animate(float theta){
     
-    imageMode(CENTER);
-  }
-
-  void display(float xpos, float ypos, float theta) {
-    frame = (frame+1) % imageCount;
+    spriteFrame = (spriteFrame+1) % spriteImages.size();
     pushMatrix();
     //translate and rotate to give direction to the image.
-    translate(xpos,ypos);
+    translate(location.x,location.y);
     rotate(theta);
-    image(images[frame], 0,0);
+    imageMode(CENTER);
+    image(spriteImages.get(spriteFrame), 0,0);
     popMatrix();
   }
+ 
   
-} //class Animation
+} //boid class ends
 
 
 class Flower{
