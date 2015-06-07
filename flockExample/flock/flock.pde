@@ -47,17 +47,12 @@ void mousePressed() {
 }
 
 void addFlower(){
-    Flower fl= new Flower();
-    
+    Flower fl;
     if(int(random(0,3))==1){
-      
-      fl.flower=flower1;
+      fl= new Flower(mouseX,mouseY,flower1);
     }else{
-      fl.flower=flower2;
+      fl= new Flower(mouseX,mouseY,flower2);
     }
-    fl.x=mouseX;
-    fl.y=mouseY;
-    
     flowers.add(fl);  
 }
 
@@ -115,6 +110,7 @@ class Boid {
     r = 2.0;
     maxspeed = 2;
     maxforce = 0.03;
+    
     
     spriteImages=sprite;
     spriteFrame=0;
@@ -318,10 +314,14 @@ class Boid {
 
 class Flower{
   PImage flower;
-  int x;
-  int y;
+  PVector location;
+  
+  Flower(x,y,PImage flower){
+    location= new PVector(x,y);
+    flower=flower;
+  }
   
   void draw(){
-   image(flower,x,y); 
+   image(flower,location.x,location.y); 
   }
 }//class Flower
