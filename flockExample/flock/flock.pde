@@ -27,7 +27,6 @@ void setup() {
 
 void draw() {
   background(bgImg);
-  
   //draw flowers
   for (Flower flo : flowers) {
       flo.draw();
@@ -56,12 +55,10 @@ void addFlower(){
     flowers.add(fl);  
 }
 
-
 // The Flock (a list of Boid objects)
 
 class Flock {
   ArrayList<Boid> boids; // An ArrayList for all the boids
-
   Flock() {
     boids = new ArrayList<Boid>(); // Initialize the ArrayList
   }
@@ -92,6 +89,9 @@ class Boid {
   float maxforce;    // Maximum steering force
   float maxspeed;    // Maximum speed
   
+  float flowerDistance;
+  int onFlowerState;
+  
   //for animation
   ArrayList<PImage> spriteImages;
   int spriteFrame;
@@ -114,6 +114,8 @@ class Boid {
     
     spriteImages=sprite;
     spriteFrame=0;
+    flowerDistance=100.0;
+    onFlowerState=0;
   }
 
   void run(ArrayList<Boid> boids) {
@@ -133,6 +135,8 @@ class Boid {
     PVector sep = separate(boids);   // Separation
     PVector ali = align(boids);      // Alignment
     PVector coh = cohesion(boids);   // Cohesion
+    steerToFlower(boids);
+    
     // Arbitrarily weight these forces
     sep.mult(2.3);
     ali.mult(1.0);
@@ -142,6 +146,31 @@ class Boid {
     applyForce(ali);
     applyForce(coh);
   }
+  
+  void steerToFlower(ArrayList<Boid> boids){
+      
+    for(Boid boid : boids){
+      for (Flower flower: flowers){
+          float d = PVector.dist(boid.location, flower.location);
+          if(d<flowerDistance ){
+            
+            flower.numOfBees++;
+            boid.onFlowerState=1;
+            //steer towards flower;
+            boid.acceleration.add(seek(flower.location));
+            println(d);
+            if(d<(flowerDistance/2)){
+              println("slow it down");
+            }
+            
+          }
+          
+      }
+    }
+    
+    
+  }
+  
 
   // Method to update location
   void update() {
@@ -153,6 +182,7 @@ class Boid {
     // Reset accelertion to 0 each cycle
     acceleration.mult(0);
   }
+  
 
   // A method that calculates and applies a steering force towards a target
   // STEER = DESIRED MINUS VELOCITY
@@ -297,7 +327,6 @@ class Boid {
   
   //functions animation  
   void animate(float theta){
-    
     spriteFrame = (spriteFrame+1) % spriteImages.size();
     pushMatrix();
     //translate and rotate to give direction to the image.
@@ -315,10 +344,12 @@ class Boid {
 class Flower{
   PImage flower;
   PVector location;
+  int numOfBees;
   
-  Flower(x,y,PImage flower){
+  Flower(float x,float y,PImage flower){
     location= new PVector(x,y);
-    flower=flower;
+    this.flower=flower;
+    numOfBees=0;
   }
   
   void draw(){
