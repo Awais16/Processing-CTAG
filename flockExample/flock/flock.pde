@@ -20,7 +20,7 @@ void setup() {
  
   
   // Add an initial set of boids into the system
-  for (int i = 0; i <100 ; i++) {
+  for (int i = 0; i <20 ; i++) {
     flock.addBoid(new Boid(width/2,height/2,bSprite));
   }
 }
@@ -138,9 +138,9 @@ class Boid {
   // We accumulate a new acceleration each time based on three rules
   void flock(ArrayList<Boid> boids) {
     
-    steerToFlower(boids);
+    steerToFlower();
     
-    if(this.onFlowerState==0 || this.onFlowerState==4){ //if its not on flower then apply other forces or just flied from flowers
+    if(this.onFlowerState==0 ){ //if its not on flower then apply other forces or just flied from flowers
       PVector sep = separate(boids);   // Separation
       PVector ali = align(boids);      // Alignment
       PVector coh = cohesion(boids);   // Cohesion
@@ -157,62 +157,104 @@ class Boid {
     
   }
   
-  void steerToFlower(ArrayList<Boid> boids){
+  int findClosest(){
+    float min=flowerDistance;
+    int i=0,index=-1;
+    for (Flower flower: flowers){
+       float d = PVector.dist(this.location, flower.location);
+       if(d<min){
+         min=d;
+         index=i;
+       }
+       i++;
+    }
+    return index;
+  }
+  
+  void steerToFlower(){
       
-      for (Flower flower: flowers){
+      //for (Flower flower: flowers){
+        int closestFlower=this.findClosest();
+        if(closestFlower!=-1){
+          
         
+          Flower flower= flowers.get(closestFlower);          
           float d = PVector.dist(this.location, flower.location);
-         
-          if(d<flowerDistance && this.onFlowerState==0){
-            //steer towards flower;
-            this.acceleration.add(seek(flower.location));
-            //println("steered to flower"); //<>// //<>//
+          println("distance="+d);
+          
+          if(flower.numOfBees<2){ //<>//
+            if(d<flowerDistance && this.onFlowerState==0){
+              
+              //steer towards flower;
+              flower.numOfBees++;
+              this.onFlowerState=1;
+              this.acceleration.add(seek(flower.location));
+              println("state1");
+            }
+          }else if(this.onFlowerState==0){
+            PVector steerAway=seek(flower.location);
+            steerAway.normalize();
+            steerAway.mult(-1*(maxspeed/2));
+            this.acceleration.add(steerAway);
           }
           
-          if(d<(flowerDistance/2) && this.onFlowerState==0 && flower.numOfBees<2){
+          if(this.onFlowerState==1){
+            this.acceleration.add(seek(flower.location));
+            if(d<(flowerDistance/2)){
               this.velocity.normalize();
               this.velocity.mult(maxspeed/3);
-              this.onFlowerState=1;
-              flower.numOfBees++;
-              //println("state1: half distance slow down");
-            }
-           else if(d<20 && this.onFlowerState==1  ){
-              
               this.onFlowerState=2;
-              this.velocity.normalize();
-              this.velocity.mult(0.1);
-              this.onFlowerStartTime = millis();
-              //println("state2: dead slow!");
+            }
+          }
+          
+          if(this.onFlowerState==2){
+              this.acceleration.add(seek(flower.location));
+              if(d<(flowerDistance/3)){
+                this.velocity.normalize();
+                this.velocity.mult(0.1);
+                this.onFlowerStartTime = millis();
+                this.onFlowerState=3; 
+              } 
+              //println("state3: dead slow!");
               //println("sitTime"+(this.flowerSitTime));
-            }else if(d<10 && this.onFlowerState==2){
-              this.onFlowerState=3;
+          }
+         
+         
+          if(this.onFlowerState==3){
+            this.acceleration.add(seek(flower.location));
+            if(d<10){
               this.velocity.normalize();
               this.velocity.mult(0);
               this.acceleration.normalize();
               this.acceleration.mult(0);
-              
-              //println("state3: dead!");
-            }else if(this.onFlowerState==3){
+              this.onFlowerState=4;
+            }
+          }
+            
+            if(this.onFlowerState==4){
              if(this.onFlowerDuration<(millis()-this.onFlowerStartTime)){
                 //println("times up");
                 //should fly away from flower now;
                 float angle = random(TWO_PI);
                 this.velocity = new PVector(cos(angle), sin(angle));
-                this.onFlowerState=4;
+                this.onFlowerState=5;
                 this.lastOnFlowerTime=millis();
                 flower.numOfBees--;
               } 
             }
-            else if(onFlowerState==4){
+          }  
+            
+            if(onFlowerState==5){
               if(this.nextOnFlowerDuration<(millis()-this.lastOnFlowerTime)){
                 //println("refilled");
                 this.onFlowerState=0;
               } 
             }
         
-      }//for flower
-    
+      //}//for flower
+      
   }
+  
   
 
   // Method to update location
@@ -370,7 +412,7 @@ class Boid {
   
   //functions animation  
   void animate(float theta){
-    if(this.onFlowerState==3 || this.onFlowerState==2){
+    if(this.onFlowerState==4){
       spriteFrame = 1;
     }else{
       spriteFrame = (spriteFrame+1) % spriteImages.size();
