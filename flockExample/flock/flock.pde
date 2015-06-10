@@ -20,7 +20,7 @@ void setup() {
  
   
   // Add an initial set of boids into the system
-  for (int i = 0; i <1 ; i++) {
+  for (int i = 0; i <100 ; i++) {
     flock.addBoid(new Boid(width/2,height/2,bSprite));
   }
 }
@@ -91,8 +91,10 @@ class Boid {
   
   float flowerDistance;
   int onFlowerState;
-  double flowerSitTime;
-  
+  double onFlowerStartTime;
+  double onFlowerDuration; //will sit on flower for these millies millis
+  double lastOnFlowerTime;
+  double nextOnFlowerDuration; //after which bee will be attracted again to a flower :millis
   //for animation
   ArrayList<PImage> spriteImages;
   int spriteFrame;
@@ -117,6 +119,8 @@ class Boid {
     spriteFrame=0;
     flowerDistance=100.0;
     onFlowerState=0;
+    onFlowerDuration= 10000;//10sec
+    nextOnFlowerDuration= 20000; //20sec
   }
 
   void run(ArrayList<Boid> boids) {
@@ -136,7 +140,7 @@ class Boid {
     
     steerToFlower(boids);
     
-    if(this.onFlowerState==0){ //if its not on flower then apply other forces
+    if(this.onFlowerState==0 || this.onFlowerState==4){ //if its not on flower then apply other forces or just flied from flowers
       PVector sep = separate(boids);   // Separation
       PVector ali = align(boids);      // Alignment
       PVector coh = cohesion(boids);   // Cohesion
@@ -155,37 +159,58 @@ class Boid {
   
   void steerToFlower(ArrayList<Boid> boids){
       
-    
       for (Flower flower: flowers){
+        
           float d = PVector.dist(this.location, flower.location);
+         
           if(d<flowerDistance && this.onFlowerState==0){
-            
-            flower.numOfBees++;
             //steer towards flower;
             this.acceleration.add(seek(flower.location));
-            //println(d); //<>// //<>//
+            //println("steered to flower"); //<>// //<>//
           }
-          println(d);
           
-          if(d<(flowerDistance/2)){
-              this.onFlowerState=1;
+          if(d<(flowerDistance/2) && this.onFlowerState==0 && flower.numOfBees<2){
               this.velocity.normalize();
-              this.velocity.mult(maxspeed/2);
+              this.velocity.mult(maxspeed/3);
+              this.onFlowerState=1;
+              flower.numOfBees++;
+              //println("state1: half distance slow down");
             }
-            if(d<10){
+           else if(d<20 && this.onFlowerState==1  ){
+              
               this.onFlowerState=2;
               this.velocity.normalize();
               this.velocity.mult(0.1);
-              this.flowerSitTime = millis();
-            }
-            if(d<5){
+              this.onFlowerStartTime = millis();
+              //println("state2: dead slow!");
+              //println("sitTime"+(this.flowerSitTime));
+            }else if(d<10 && this.onFlowerState==2){
               this.onFlowerState=3;
               this.velocity.normalize();
               this.velocity.mult(0);
+              this.acceleration.normalize();
               this.acceleration.mult(0);
               
+              //println("state3: dead!");
+            }else if(this.onFlowerState==3){
+             if(this.onFlowerDuration<(millis()-this.onFlowerStartTime)){
+                //println("times up");
+                //should fly away from flower now;
+                float angle = random(TWO_PI);
+                this.velocity = new PVector(cos(angle), sin(angle));
+                this.onFlowerState=4;
+                this.lastOnFlowerTime=millis();
+                flower.numOfBees--;
+              } 
             }
-      }
+            else if(onFlowerState==4){
+              if(this.nextOnFlowerDuration<(millis()-this.lastOnFlowerTime)){
+                //println("refilled");
+                this.onFlowerState=0;
+              } 
+            }
+        
+      }//for flower
     
   }
   
