@@ -20,7 +20,7 @@ void setup() {
  
   
   // Add an initial set of boids into the system
-  for (int i = 0; i <20 ; i++) {
+  for (int i = 0; i <10 ; i++) {
     flock.addBoid(new Boid(width/2,height/2,bSprite));
   }
 }
@@ -140,7 +140,7 @@ class Boid {
     
     steerToFlower();
     
-    if(this.onFlowerState==0 ){ //if its not on flower then apply other forces or just flied from flowers
+    //if(this.onFlowerState==0 ){ //if its not on flower then apply other forces or just flied from flowers
       PVector sep = separate(boids);   // Separation
       PVector ali = align(boids);      // Alignment
       PVector coh = cohesion(boids);   // Cohesion
@@ -153,7 +153,7 @@ class Boid {
       applyForce(sep);
       applyForce(ali);
       applyForce(coh);
-    }
+    //}
     
   }
   
@@ -161,6 +161,7 @@ class Boid {
     float min=flowerDistance;
     int i=0,index=-1;
     for (Flower flower: flowers){
+       //println(flower.numOfBees);
        float d = PVector.dist(this.location, flower.location);
        if(d<min){
          min=d;
@@ -178,24 +179,23 @@ class Boid {
         if(closestFlower!=-1){
           
         
-          Flower flower= flowers.get(closestFlower);          
+          Flower flower= flowers.get(closestFlower);       
+            
           float d = PVector.dist(this.location, flower.location);
-          println("distance="+d);
+          //println("distance="+d);
           
-          if(flower.numOfBees<2){ //<>//
-            if(d<flowerDistance && this.onFlowerState==0){
-              
-              //steer towards flower;
+          if(flower.numOfBees<flower.maxBees){
+            if(d<flowerDistance && this.onFlowerState==0){ //<>//
               flower.numOfBees++;
               this.onFlowerState=1;
               this.acceleration.add(seek(flower.location));
-              println("state1");
             }
           }else if(this.onFlowerState==0){
-            PVector steerAway=seek(flower.location);
+            /*PVector steerAway=seek(flower.location);
             steerAway.normalize();
-            steerAway.mult(-1*(maxspeed/2));
-            this.acceleration.add(steerAway);
+            steerAway.mult(-0.1*(maxspeed/3));
+            steerAway.limit(maxspeed);
+            this.acceleration.add(steerAway);*/
           }
           
           if(this.onFlowerState==1){
@@ -235,11 +235,13 @@ class Boid {
              if(this.onFlowerDuration<(millis()-this.onFlowerStartTime)){
                 //println("times up");
                 //should fly away from flower now;
+                flower.numOfBees--;
+                
+                //println(flowers.get(0).numOfBees);
                 float angle = random(TWO_PI);
                 this.velocity = new PVector(cos(angle), sin(angle));
                 this.onFlowerState=5;
                 this.lastOnFlowerTime=millis();
-                flower.numOfBees--;
               } 
             }
           }  
@@ -327,7 +329,7 @@ class Boid {
     for (Boid other : boids) {
       float d = PVector.dist(location, other.location);
       // If the distance is greater than 0 and less than an arbitrary amount (0 when you are yourself)
-      if ((d > 0) && (d < desiredseparation)) {
+      if ((d > 0) && (d < desiredseparation) && (other.onFlowerState==0 && this.onFlowerState==0) ) {
         // Calculate vector pointing away from neighbor
         PVector diff = PVector.sub(location, other.location);
         diff.normalize();
@@ -364,7 +366,7 @@ class Boid {
     int count = 0;
     for (Boid other : boids) {
       float d = PVector.dist(location, other.location);
-      if ((d > 0) && (d < neighbordist)) {
+      if ((d > 0) && (d < neighbordist) && (other.onFlowerState==0 && this.onFlowerState==0)) {
         sum.add(other.velocity);
         count++;
       }
@@ -395,7 +397,7 @@ class Boid {
     int count = 0;
     for (Boid other : boids) {
       float d = PVector.dist(location, other.location);
-      if ((d > 0) && (d < neighbordist)) {
+      if ((d > 0) && (d < neighbordist) && (other.onFlowerState==0 && this.onFlowerState==0)) {
         sum.add(other.location); // Add location
         count++;
       }
@@ -434,6 +436,7 @@ class Flower{
   PImage flower;
   PVector location;
   int numOfBees;
+  int maxBees=2;
   
   Flower(float x,float y,PImage flower){
     location= new PVector(x,y);
