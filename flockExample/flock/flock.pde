@@ -91,6 +91,7 @@ class Boid {
   
   float flowerDistance;
   int onFlowerState;
+  double flowerSitTime;
   
   //for animation
   ArrayList<PImage> spriteImages;
@@ -132,42 +133,59 @@ class Boid {
 
   // We accumulate a new acceleration each time based on three rules
   void flock(ArrayList<Boid> boids) {
-    PVector sep = separate(boids);   // Separation
-    PVector ali = align(boids);      // Alignment
-    PVector coh = cohesion(boids);   // Cohesion
+    
     steerToFlower(boids);
     
-    // Arbitrarily weight these forces
-    sep.mult(2.3);
-    ali.mult(1.0);
-    coh.mult(1.0);
-    // Add the force vectors to acceleration
-    applyForce(sep);
-    applyForce(ali);
-    applyForce(coh);
+    if(this.onFlowerState==0){ //if its not on flower then apply other forces
+      PVector sep = separate(boids);   // Separation
+      PVector ali = align(boids);      // Alignment
+      PVector coh = cohesion(boids);   // Cohesion
+      
+      // Arbitrarily weight these forces
+      sep.mult(2.3);
+      ali.mult(1.0);
+      coh.mult(1.0);
+      // Add the force vectors to acceleration
+      applyForce(sep);
+      applyForce(ali);
+      applyForce(coh);
+    }
+    
   }
   
   void steerToFlower(ArrayList<Boid> boids){
       
-    for(Boid boid : boids){
+    
       for (Flower flower: flowers){
-          float d = PVector.dist(boid.location, flower.location);
-          if(d<flowerDistance ){
+          float d = PVector.dist(this.location, flower.location);
+          if(d<flowerDistance && this.onFlowerState==0){
             
             flower.numOfBees++;
-            boid.onFlowerState=1;
             //steer towards flower;
-            boid.acceleration.add(seek(flower.location));
-            println(d);
-            if(d<(flowerDistance/2)){
-              println("slow it down");
-            }
-            
+            this.acceleration.add(seek(flower.location));
+            //println(d); //<>// //<>//
           }
+          println(d);
           
+          if(d<(flowerDistance/2)){
+              this.onFlowerState=1;
+              this.velocity.normalize();
+              this.velocity.mult(maxspeed/2);
+            }
+            if(d<10){
+              this.onFlowerState=2;
+              this.velocity.normalize();
+              this.velocity.mult(0.1);
+              this.flowerSitTime = millis();
+            }
+            if(d<5){
+              this.onFlowerState=3;
+              this.velocity.normalize();
+              this.velocity.mult(0);
+              this.acceleration.mult(0);
+              
+            }
       }
-    }
-    
     
   }
   
@@ -327,7 +345,11 @@ class Boid {
   
   //functions animation  
   void animate(float theta){
-    spriteFrame = (spriteFrame+1) % spriteImages.size();
+    if(this.onFlowerState==3 || this.onFlowerState==2){
+      spriteFrame = 1;
+    }else{
+      spriteFrame = (spriteFrame+1) % spriteImages.size();
+    }
     pushMatrix();
     //translate and rotate to give direction to the image.
     translate(location.x,location.y);
