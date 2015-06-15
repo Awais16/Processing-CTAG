@@ -2,25 +2,27 @@ Flock flock;
 PImage bgImg,flower1,flower2;
 ArrayList<Flower> flowers;
 ArrayList<PImage> bSprite;
+int flockSize=20;
 
 void setup() {
   size(1024,768); //size of bgImage should of equal to this
   flock = new Flock();
   
   bgImg= loadImage("bg1.jpg");
-  flower1= loadImage("Flower01.png");
-  flower2= loadImage("Flower02.png");
+  flower1= loadImage("Flower03.png");
+  flower2= loadImage("Flower04.png");
   
   bSprite=new ArrayList<PImage>();
   bSprite.add(loadImage("Bee up.png"));
   bSprite.add(loadImage("Bee normal.png"));
   bSprite.add(loadImage("Bee down.png"));
+  bSprite.add(loadImage("Bee stop.png"));
   
   flowers=new ArrayList<Flower>(); //list of add flowers
  
   
   // Add an initial set of boids into the system
-  for (int i = 0; i <10 ; i++) {
+  for (int i = 0; i <flockSize ; i++) {
     flock.addBoid(new Boid(width/2,height/2,bSprite));
   }
 }
@@ -223,10 +225,10 @@ class Boid {
           if(this.onFlowerState==3){
             this.acceleration.add(seek(flower.location));
             if(d<10){
-              this.velocity.normalize();
+              /*this.velocity.x= this.velocity.x*-1;
+              this.velocity.y= this.velocity.y*-1;*/
               this.velocity.mult(0);
-              this.acceleration.normalize();
-              this.acceleration.mult(0);
+              this.acceleration.mult(0.0001);
               this.onFlowerState=4;
             }
           }
@@ -414,17 +416,21 @@ class Boid {
   
   //functions animation  
   void animate(float theta){
-    if(this.onFlowerState==4){
-      spriteFrame = 1;
-    }else{
-      spriteFrame = (spriteFrame+1) % spriteImages.size();
-    }
+    
     pushMatrix();
     //translate and rotate to give direction to the image.
     translate(location.x,location.y);
     rotate(theta);
     imageMode(CENTER);
-    image(spriteImages.get(spriteFrame), 0,0);
+    if(this.onFlowerState==4){
+      //spriteFrame = 1;
+      image(spriteImages.get(spriteImages.size()-1), 0,0);
+    }else{
+      spriteFrame = (spriteFrame+1) % (spriteImages.size()-1);
+      image(spriteImages.get(spriteFrame), 0,0);
+    }
+    
+    
     popMatrix();
   }
  
