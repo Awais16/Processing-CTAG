@@ -1,16 +1,17 @@
 Flock flock;
-PImage bgImg,flower1,flower2;
+PImage bgImg,flower1,flower2,flower3;
 ArrayList<Flower> flowers;
 ArrayList<PImage> bSprite;
-int flockSize=20;
+int flockSize=50;
 
 void setup() {
   size(1024,768); //size of bgImage should of equal to this
   flock = new Flock();
   
-  bgImg= loadImage("bg1.jpg");
+  bgImg= loadImage("bg2.jpg");
   flower1= loadImage("Flower03.png");
   flower2= loadImage("Flower04.png");
+  flower3= loadImage("Flower05.png");
   
   bSprite=new ArrayList<PImage>();
   bSprite.add(loadImage("Bee up.png"));
@@ -49,10 +50,13 @@ void mousePressed() {
 
 void addFlower(){
     Flower fl;
-    if(int(random(0,3))==1){
+    int flowerNum=int(random(0,4));
+    if(flowerNum==1){
       fl= new Flower(mouseX,mouseY,flower1);
-    }else{
+    }else if(flowerNum==2){
       fl= new Flower(mouseX,mouseY,flower2);
+    }else{
+      fl= new Flower(mouseX,mouseY,flower3);
     }
     flowers.add(fl);  
 }
@@ -140,7 +144,7 @@ class Boid {
   // We accumulate a new acceleration each time based on three rules
   void flock(ArrayList<Boid> boids) {
     
-    steerToFlower();
+      steerToFlower();
     
     //if(this.onFlowerState==0 ){ //if its not on flower then apply other forces or just flied from flowers
       PVector sep = separate(boids);   // Separation
@@ -238,10 +242,9 @@ class Boid {
                 //println("times up");
                 //should fly away from flower now;
                 flower.numOfBees--;
-                
-                //println(flowers.get(0).numOfBees);
                 float angle = random(TWO_PI);
                 this.velocity = new PVector(cos(angle), sin(angle));
+                this.velocity.limit(maxspeed);
                 this.onFlowerState=5;
                 this.lastOnFlowerTime=millis();
               } 
