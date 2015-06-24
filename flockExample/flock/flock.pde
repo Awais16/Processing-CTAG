@@ -4,11 +4,25 @@ ArrayList<Flower> flowers;
 ArrayList<PImage> bSprite;
 int flockSize=50;
 
+
+float swt = 2.3;     //sep.mult(25.0f);
+float awt = 1.0;      //ali.mult(4.0f);
+float cwt = 1.0;      //coh.mult(5.0f);
+float maxspeed = 2;
+float maxforce = 0.03;
+float flowerDistance=100;
+
+boolean showvalues = true;
+boolean scrollbar = false;
+
+
 void setup() {
-  size(1024,768); //size of bgImage should of equal to this
-  flock = new Flock();
+  size(800,600); //size of bgImage should of equal to this
   
-  bgImg= loadImage("bg2.jpg");
+  setupScrollbars();
+  
+  flock = new Flock();
+  bgImg= loadImage("bg3.png");
   flower1= loadImage("Flower03.png");
   flower2= loadImage("Flower04.png");
   flower3= loadImage("Flower05.png");
@@ -36,6 +50,8 @@ void draw() {
     }
   
   flock.run();
+  
+  drawScrollbars();
 }
 
 // Add a new boid into the System
@@ -78,10 +94,7 @@ class Flock {
   void addBoid(Boid b) {
     boids.add(b);
   }
-
 }
-
-
 
 
 // The Boid class
@@ -92,10 +105,10 @@ class Boid {
   PVector velocity;
   PVector acceleration;
   float r;
-  float maxforce;    // Maximum steering force
-  float maxspeed;    // Maximum speed
+  //float maxforce;    // Maximum steering force
+  //float maxspeed;    // Maximum speed
   
-  float flowerDistance;
+  //float flowerDistance;
   int onFlowerState;
   double onFlowerStartTime;
   double onFlowerDuration; //will sit on flower for these millies millis
@@ -117,13 +130,13 @@ class Boid {
 
     location = new PVector(x, y);
     r = 2.0;
-    maxspeed = 2;
-    maxforce = 0.03;
+    //maxspeed = 2;
+    //maxforce = 0.03;
     
     
     spriteImages=sprite;
     spriteFrame=0;
-    flowerDistance=100.0;
+    //flowerDistance=100.0;
     onFlowerState=0;
     onFlowerDuration= 10000;//10sec
     nextOnFlowerDuration= 20000; //20sec
@@ -152,9 +165,9 @@ class Boid {
       PVector coh = cohesion(boids);   // Cohesion
       
       // Arbitrarily weight these forces
-      sep.mult(2.3);
-      ali.mult(1.0);
-      coh.mult(1.0);
+      sep.mult(swt);
+      ali.mult(awt);
+      coh.mult(cwt);
       // Add the force vectors to acceleration
       applyForce(sep);
       applyForce(ali);
@@ -191,7 +204,7 @@ class Boid {
           //println("distance="+d);
           
           if(flower.numOfBees<flower.maxBees){
-            if(d<flowerDistance && this.onFlowerState==0){ //<>//
+            if(d<flowerDistance && this.onFlowerState==0){
               flower.numOfBees++;
               this.onFlowerState=1;
               this.acceleration.add(seek(flower.location));
