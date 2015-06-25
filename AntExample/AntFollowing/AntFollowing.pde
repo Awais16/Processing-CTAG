@@ -2,76 +2,72 @@
 // Daniel Shiffman
 // http://natureofcode.com
 
-// Crowd Path Following
-// Via Reynolds: http://www.red3d.com/cwr/steer/CrowdPath.html
+// Path Following
+// Via Reynolds: // http://www.red3d.com/cwr/steer/PathFollow.html
 
 // Using this variable to decide whether to draw all the stuff
-boolean debug = false;
-
+boolean debug = true;
 
 // A path object (series of connected points)
 Path path;
 
 // Two vehicles
-ArrayList<Vehicle> vehicles;
+Vehicle car1;
+Vehicle car2;
+
+ArrayList<PImage> spriteImages;
+int spriteFrame=0;
 
 void setup() {
-  size(640,360);
+  size(640, 360);
   // Call a function to generate new Path object
   newPath();
-
-  // We are now making random vehicles and storing them in an ArrayList
-  vehicles = new ArrayList<Vehicle>();
-  for (int i = 0; i < 120; i++) {
-    newVehicle(random(width),random(height));
-  }
+  
+  spriteImages= new ArrayList<PImage>();
+  spriteImages.add(loadImage("Ant up.png"));
+  spriteImages.add(loadImage("Ant normal.png"));
+  spriteImages.add(loadImage("Ant down.png"));
+  
+  // Each vehicle has different maxspeed and maxforce for demo purposes
+  car1 = new Vehicle(new PVector(0, height/2), 2, 0.04);
+  car2 = new Vehicle(new PVector(0, height/2), 3, 0.1);
 }
 
 void draw() {
   background(255);
   // Display the path
   path.display();
-
-  for (Vehicle v : vehicles) {
-    // Path following and separation are worked on in this function
-    v.applyBehaviors(vehicles,path);
-    // Call the generic run method (update, borders, display, etc.)
-    v.run();
-  }
+  // The boids follow the path
+  car1.follow(path);
+  car2.follow(path);
+  // Call the generic run method (update, borders, display, etc.)
+  car1.run();
+  car2.run();
+  
+  car1.borders(path);
+  car2.borders(path);
 
   // Instructions
   fill(0);
-  textAlign(CENTER);
-  text("Hit 'd' to toggle debugging lines.\nClick the mouse to generate new vehicles.",width/2,height-20);
+  text("Hit space bar to toggle debugging lines.\nClick the mouse to generate a new path.", 10, height-30);
 }
 
 void newPath() {
   // A path is a series of connected points
   // A more sophisticated path might be a curve
   path = new Path();
-  float offset = 30;
-  path.addPoint(offset,offset);
-  path.addPoint(width-offset,offset);
-  path.addPoint(width-offset,height-offset);
-  path.addPoint(width/2,height-offset*3);
-  path.addPoint(offset,height-offset);
+  path.addPoint(-20, height/2);
+  path.addPoint(random(0, width/2), random(0, height));
+  path.addPoint(random(width/2, width), random(0, height));
+  path.addPoint(width+20, height/2);
 }
 
-void newVehicle(float x, float y) {
-  float maxspeed = random(2,4);
-  float maxforce = 0.3;
-  vehicles.add(new Vehicle(new PVector(x,y),maxspeed,maxforce));
-}
-
-void keyPressed() {
-  if (key == 'd') {
+public void keyPressed() {
+  if (key == ' ') {
     debug = !debug;
   }
 }
 
-void mousePressed() {
-  newVehicle(mouseX,mouseY);
+public void mousePressed() {
+  newPath();
 }
-
-
-

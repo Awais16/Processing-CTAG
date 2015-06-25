@@ -2,6 +2,7 @@ Flock flock;
 PImage bgImg,flower1,flower2,flower3;
 ArrayList<Flower> flowers;
 ArrayList<PImage> bSprite;
+ArrayList<PImage> bSprite2;
 int flockSize=50;
 
 
@@ -33,12 +34,16 @@ void setup() {
   bSprite.add(loadImage("Bee down.png"));
   bSprite.add(loadImage("Bee stop.png"));
   
+  bSprite2=new ArrayList<PImage>();
+  bSprite2.add(loadImage("yBee up.png"));
+  bSprite2.add(loadImage("yBee normal.png"));
+  bSprite2.add(loadImage("yBee down.png"));
+  
   flowers=new ArrayList<Flower>(); //list of add flowers
  
-  
   // Add an initial set of boids into the system
   for (int i = 0; i <flockSize ; i++) {
-    flock.addBoid(new Boid(width/2,height/2,bSprite));
+    flock.addBoid(new Boid(width/2,height/2,bSprite,bSprite2));
   }
 }
 
@@ -59,7 +64,7 @@ void mousePressed() {
   if (mouseButton == RIGHT){
     addFlower();
   }else{
-    flock.addBoid(new Boid(mouseX,mouseY,bSprite));  
+    flock.addBoid(new Boid(mouseX,mouseY,bSprite,bSprite2));
   }
   
 }
@@ -116,9 +121,10 @@ class Boid {
   double nextOnFlowerDuration; //after which bee will be attracted again to a flower :millis
   //for animation
   ArrayList<PImage> spriteImages;
+  ArrayList<PImage> spriteImagesY;
   int spriteFrame;
 
-    Boid(float x, float y, ArrayList<PImage> sprite) {
+    Boid(float x, float y, ArrayList<PImage> sprite, ArrayList<PImage> sprite2) {
     acceleration = new PVector(0, 0);
 
     // This is a new PVector method not yet implemented in JS
@@ -133,8 +139,8 @@ class Boid {
     //maxspeed = 2;
     //maxforce = 0.03;
     
-    
     spriteImages=sprite;
+    spriteImagesY=sprite2;
     spriteFrame=0;
     //flowerDistance=100.0;
     onFlowerState=0;
@@ -159,7 +165,7 @@ class Boid {
     
       steerToFlower();
     
-    //if(this.onFlowerState==0 ){ //if its not on flower then apply other forces or just flied from flowers
+    
       PVector sep = separate(boids);   // Separation
       PVector ali = align(boids);      // Alignment
       PVector coh = cohesion(boids);   // Cohesion
@@ -172,7 +178,7 @@ class Boid {
       applyForce(sep);
       applyForce(ali);
       applyForce(coh);
-    //}
+    
     
   }
   
@@ -264,7 +270,7 @@ class Boid {
             }
           }  
             
-            if(onFlowerState==5){
+            if(onFlowerState==5){ //bee is full
               if(this.nextOnFlowerDuration<(millis()-this.lastOnFlowerTime)){
                 //println("refilled");
                 this.onFlowerState=0;
@@ -443,7 +449,12 @@ class Boid {
       image(spriteImages.get(spriteImages.size()-1), 0,0);
     }else{
       spriteFrame = (spriteFrame+1) % (spriteImages.size()-1);
-      image(spriteImages.get(spriteFrame), 0,0);
+      if(this.onFlowerState==5){
+        image(spriteImagesY.get(spriteFrame), 0,0);
+      }else{
+        image(spriteImages.get(spriteFrame), 0,0);
+      }
+      
     }
     
     

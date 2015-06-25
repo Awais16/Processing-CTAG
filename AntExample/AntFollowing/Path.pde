@@ -22,11 +22,18 @@ class Path {
     PVector point = new PVector(x, y);
     points.add(point);
   }
+  
+  PVector getStart() {
+     return points.get(0);
+  }
+
+  PVector getEnd() {
+     return points.get(points.size()-1);
+  }
+
 
   // Draw the path
   void display() {
-    strokeJoin(ROUND);
-    
     // Draw thick line for radius
     stroke(175);
     strokeWeight(radius*2);
@@ -35,7 +42,7 @@ class Path {
     for (PVector v : points) {
       vertex(v.x, v.y);
     }
-    endShape(CLOSE);
+    endShape();
     // Draw thin line for center of path
     stroke(0);
     strokeWeight(1);
@@ -44,9 +51,6 @@ class Path {
     for (PVector v : points) {
       vertex(v.x, v.y);
     }
-    endShape(CLOSE);
+    endShape();
   }
 }
-
-
-
