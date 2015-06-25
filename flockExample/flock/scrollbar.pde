@@ -24,7 +24,7 @@ void setupScrollbars() {
   hs[1].setPos(0.3);
   hs[2].setPos(0.3);
   hs[3].setPos(0.2);
-  hs[4].setPos(0.2);
+  hs[4].setPos(0.02);
   hs[5].setPos(1);
 
 }
@@ -42,7 +42,7 @@ void drawScrollbars() {
     for (int i = 0; i < hs.length; i++) {
       hs[i].update();
       hs[i].draw();
-      fill(FFFFFF);
+      fill(#FFFFFF);
       textAlign(LEFT);
       text(labels[i]+"["+(hs[i].getPos()*times[i])+"]",x+w+spacing,y+i*(h+spacing)+spacing);
       //text(hs[i].getPos(),x+w+spacing+75,y+i*(h+spacing)+spacing);
