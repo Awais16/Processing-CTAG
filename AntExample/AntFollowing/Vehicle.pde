@@ -45,7 +45,7 @@ class Vehicle {
     // This could be based on speed 
     PVector predict = velocity.get();
     predict.normalize();
-    predict.mult(50);
+    predict.mult(20);
     PVector predictLoc = PVector.add(location, predict);
 
     // Now we must find the normal to the path from the predicted location
@@ -66,7 +66,8 @@ class Vehicle {
       PVector normalPoint = getNormalPoint(predictLoc, a, b);
       // This only works because we know our path goes from left to right
       // We could have a more sophisticated test to tell if the point is in the line segment or not
-      if (normalPoint.x < a.x || normalPoint.x > b.x) {
+      //if (normalPoint.x < a.x || normalPoint.x > b.x) {
+        if (normalPoint.x < min(a.x,b.x) || normalPoint.x > max(a.x,b.x) || normalPoint.y < min(a.y,b.y) || normalPoint.y > max(a.y,b.y)) {
         // This is something of a hacky solution, but if it's not within the line segment
         // consider the normal to just be the end of the line segment (point b)
         normalPoint = b.get();
@@ -165,8 +166,7 @@ class Vehicle {
     // Steering = Desired minus Velocity
     PVector steer = PVector.sub(desired, velocity);
     steer.limit(maxforce);  // Limit to maximum steering force
-
-      applyForce(steer);
+    applyForce(steer);
   }
 
   void display() {

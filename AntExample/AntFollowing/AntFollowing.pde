@@ -6,7 +6,7 @@
 // Via Reynolds: // http://www.red3d.com/cwr/steer/PathFollow.html
 
 // Using this variable to decide whether to draw all the stuff
-boolean debug = true;
+boolean debug = false;
 
 // A path object (series of connected points)
 Path path;
@@ -17,11 +17,11 @@ Vehicle car2;
 ArrayList<Vehicle> ants;
 
 ArrayList<PImage> spriteImages;
-int spriteFrame=0;
+int spriteFrame=1;
 float SMOOTH_DIST=20.0;
 
 void setup() {
-  size(640, 360);
+  size(800, 600);
   // Call a function to generate new Path object
   newPath=null;
   newPath();
@@ -92,7 +92,7 @@ public void mousePressed() {
     newPath.addPoint(mouseX,mouseY);
   }else{
     //add ant
-    ants.add(new Vehicle(new PVector(0, height/2), random(0,5), random(0.05,0.20)));
+    ants.add(new Vehicle(new PVector(0, height/2), random(0.5,5), random(0.05,0.20)));
   }
   
 }
