@@ -14,13 +14,16 @@ Path path;
 // Two vehicles
 Vehicle car1;
 Vehicle car2;
+ArrayList<Vehicle> ants;
 
 ArrayList<PImage> spriteImages;
 int spriteFrame=0;
+float SMOOTH_DIST=20.0;
 
 void setup() {
   size(640, 360);
   // Call a function to generate new Path object
+  newPath=null;
   newPath();
   
   spriteImages= new ArrayList<PImage>();
@@ -29,8 +32,11 @@ void setup() {
   spriteImages.add(loadImage("Ant down.png"));
   
   // Each vehicle has different maxspeed and maxforce for demo purposes
-  car1 = new Vehicle(new PVector(0, height/2), 2, 0.04);
-  car2 = new Vehicle(new PVector(0, height/2), 3, 0.1);
+  //car1 = new Vehicle(new PVector(0, height/2), 2, 0.04);
+  //car2 = new Vehicle(new PVector(0, height/2), 3, 0.1);
+  ants= new ArrayList<Vehicle>();
+  ants.add(new Vehicle(new PVector(0, height/2), 2, 0.04));
+  ants.add(new Vehicle(new PVector(0, height/2), 3, 0.1));
 }
 
 void draw() {
@@ -38,14 +44,21 @@ void draw() {
   // Display the path
   path.display();
   // The boids follow the path
-  car1.follow(path);
+  
+  /*car1.follow(path);
   car2.follow(path);
   // Call the generic run method (update, borders, display, etc.)
   car1.run();
   car2.run();
   
   car1.borders(path);
-  car2.borders(path);
+  car2.borders(path);*/
+  
+  for(Vehicle ant: ants){
+   ant.follow(path);
+   ant.run();
+   ant.borders(path); 
+  }
 
   // Instructions
   fill(0);
@@ -68,6 +81,47 @@ public void keyPressed() {
   }
 }
 
+//public boolean isNewPath;
+public Path newPath;
+
 public void mousePressed() {
-  newPath();
+  //newPath();
+  if (mouseButton == LEFT){
+    //draw path;
+    newPath= new Path();
+    newPath.addPoint(mouseX,mouseY);
+  }else{
+    //add ant
+    ants.add(new Vehicle(new PVector(0, height/2), random(0,5), random(0.05,0.20)));
+  }
+  
+}
+
+public void mouseDragged(){
+  if (mouseButton == LEFT){
+    if(newPath!=null){
+      newPath.addPoint(mouseX,mouseY);
+    }
+  }
+}
+
+public void mouseReleased(){
+    if(mouseButton == LEFT && newPath!=null){
+      newPath.addPoint(mouseX,mouseY);
+      // smooth it up, remove the points that are too close;
+      PVector lastPoint=newPath.getStart();
+      int i=1;
+      while(i<newPath.size()){
+        PVector nextPoint= newPath.get(i);
+       float distance= dist(lastPoint.x,lastPoint.y,nextPoint.x,nextPoint.y);
+        if(distance<SMOOTH_DIST){
+         newPath.remove(i);
+        }else{
+          lastPoint=newPath.get(i);
+          i++;
+        }
+      }
+      path=newPath;
+      newPath=null;
+    }
 }

@@ -30,6 +30,26 @@ class Path {
   PVector getEnd() {
      return points.get(points.size()-1);
   }
+  
+  PVector get(int i){
+    PVector point=null;
+    if(i<points.size()){
+      point=points.get(i);
+    }
+    return point;
+  }
+  
+  int size(){
+    return points.size();
+  }
+  
+  PVector remove(int i){
+    PVector point=null;
+    if(i<points.size()){
+      point=points.remove(i);
+    }
+    return point;
+  }
 
 
   // Draw the path

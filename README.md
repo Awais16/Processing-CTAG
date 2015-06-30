@@ -22,6 +22,4 @@ onFlowerDuration : will sit on flower for this duration  (millisec)
 nextOnFlowerDuration : will not be active (attracted, aligned etc) for this duration (millisec) 
 
 
-
-
 ## Ant lanes
