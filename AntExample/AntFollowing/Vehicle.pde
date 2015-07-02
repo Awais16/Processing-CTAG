@@ -45,7 +45,7 @@ class Vehicle {
     // This could be based on speed 
     PVector predict = velocity.get();
     predict.normalize();
-    predict.mult(20);
+    predict.mult(15);
     PVector predictLoc = PVector.add(location, predict);
 
     // Now we must find the normal to the path from the predicted location

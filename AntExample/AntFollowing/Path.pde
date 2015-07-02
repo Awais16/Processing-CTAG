@@ -55,7 +55,10 @@ class Path {
   // Draw the path
   void display() {
     // Draw thick line for radius
-    stroke(175);
+    if(debug)
+      stroke(175);
+    else
+      stroke(88,39,10,90);
     strokeWeight(radius*2);
     noFill();
     beginShape();
@@ -64,7 +67,10 @@ class Path {
     }
     endShape();
     // Draw thin line for center of path
-    stroke(0);
+    if(debug)
+      stroke(0);
+    else
+      stroke(255,200,155,50);
     strokeWeight(1);
     noFill();
     beginShape();

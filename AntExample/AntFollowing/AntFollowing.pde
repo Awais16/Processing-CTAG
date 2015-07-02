@@ -19,7 +19,7 @@ ArrayList<Vehicle> ants;
 ArrayList<PImage> spriteImages;
 int spriteFrame=1;
 float SMOOTH_DIST=20.0;
-
+PImage bg;
 void setup() {
   size(800, 600);
   // Call a function to generate new Path object
@@ -30,6 +30,7 @@ void setup() {
   spriteImages.add(loadImage("Ant up.png"));
   spriteImages.add(loadImage("Ant normal.png"));
   spriteImages.add(loadImage("Ant down.png"));
+  bg= loadImage("dirt2.jpg");
   
   // Each vehicle has different maxspeed and maxforce for demo purposes
   //car1 = new Vehicle(new PVector(0, height/2), 2, 0.04);
@@ -40,7 +41,7 @@ void setup() {
 }
 
 void draw() {
-  background(255);
+  background(bg);
   // Display the path
   path.display();
   // The boids follow the path
@@ -110,6 +111,7 @@ public void mouseReleased(){
       newPath.addPoint(mouseX,mouseY);
       // smooth it up, remove the points that are too close;
       PVector lastPoint=newPath.getStart();
+      //newPath.addPoint(lastPoint.x,lastPoint.y); //for closed path
       int i=1;
       while(i<newPath.size()){
         PVector nextPoint= newPath.get(i);
