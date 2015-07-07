@@ -30,11 +30,15 @@ void setup() {
   spriteImages.add(loadImage("Ant up.png"));
   spriteImages.add(loadImage("Ant normal.png"));
   spriteImages.add(loadImage("Ant down.png"));
+  
+//  spriteImages.add(loadImage("Ant2_1.png"));
+//  spriteImages.add(loadImage("Ant2_2.png"));
+//  spriteImages.add(loadImage("Ant2_3.png"));
+  
   bg= loadImage("dirt2.jpg");
   
   // Each vehicle has different maxspeed and maxforce for demo purposes
   //car1 = new Vehicle(new PVector(0, height/2), 2, 0.04);
-  //car2 = new Vehicle(new PVector(0, height/2), 3, 0.1);
   ants= new ArrayList<Vehicle>();
   ants.add(new Vehicle(new PVector(0, height/2), 2, 0.04));
   ants.add(new Vehicle(new PVector(0, height/2), 3, 0.1));
@@ -46,15 +50,6 @@ void draw() {
   path.display();
   // The boids follow the path
   
-  /*car1.follow(path);
-  car2.follow(path);
-  // Call the generic run method (update, borders, display, etc.)
-  car1.run();
-  car2.run();
-  
-  car1.borders(path);
-  car2.borders(path);*/
-  
   for(Vehicle ant: ants){
    ant.follow(path);
    ant.run();
@@ -63,7 +58,7 @@ void draw() {
 
   // Instructions
   fill(0);
-  text("Hit space bar to toggle debugging lines.\nClick the mouse to generate a new path.", 10, height-30);
+  text("Hit space bar to toggle debugging lines.\n Drag mouse to generate a new path.", 10, height-30);
 }
 
 void newPath() {

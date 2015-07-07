@@ -18,6 +18,7 @@ class Vehicle {
   float maxforce;    // Maximum steering force
   float maxspeed;    // Maximum speed
   
+  float PLOC_FACTOR= 20; //frames ahead
   
 
     // Constructor initialize all values
@@ -45,7 +46,7 @@ class Vehicle {
     // This could be based on speed 
     PVector predict = velocity.get();
     predict.normalize();
-    predict.mult(15);
+    predict.mult(PLOC_FACTOR);
     PVector predictLoc = PVector.add(location, predict);
 
     // Now we must find the normal to the path from the predicted location
@@ -172,25 +173,28 @@ class Vehicle {
   void display() {
     // Draw a triangle rotated in the direction of velocity
     float theta = velocity.heading2D() + radians(90);
-    /*fill(175);
-    stroke(0);
-    pushMatrix();
-    translate(location.x, location.y);
-    rotate(theta);
-    beginShape(PConstants.TRIANGLES);
-    vertex(0, -r*2);
-    vertex(-r, r*2);
-    vertex(r, r*2);
-    endShape();
-    popMatrix();*/
     animate(theta);
   }
 
   // Wraparound
   void borders(Path p) {
-    if (location.x > p.getEnd().x + r) {
+    /*if (location.x > p.getEnd().x + r) {
       location.x = p.getStart().x - r;
       location.y = p.getStart().y + (location.y-p.getEnd().y);
+    }*/
+   
+    PVector predict = velocity.get();
+    predict.normalize();
+    predict.mult(20);
+    PVector predictLoc = PVector.add(location, predict);
+    
+    float d=PVector.dist(location,p.getEnd());
+    
+    if(d<PLOC_FACTOR){
+      //println("yes");
+      //exit();
+      location.x = p.getStart().x;
+      location.y = p.getStart().y;
     }
   }
   

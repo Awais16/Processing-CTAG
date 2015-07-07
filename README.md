@@ -24,3 +24,7 @@ nextOnFlowerDuration : will not be active (attracted, aligned etc) for this dura
 
 ## Ant lanes
 
+left click to draw path which ants can follow.
+right click to add new ant.
+
+ 

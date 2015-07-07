@@ -70,8 +70,8 @@ class Path {
     if(debug)
       stroke(0);
     else
-      stroke(255,200,155,50);
-    strokeWeight(1);
+      stroke(255,200,155,15);
+    strokeWeight(5);
     noFill();
     beginShape();
     for (PVector v : points) {
