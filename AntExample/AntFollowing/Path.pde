@@ -58,7 +58,7 @@ class Path {
     if(debug)
       stroke(175);
     else
-      stroke(88,39,10,90);
+      stroke(255,255,255,20);
     strokeWeight(radius*2);
     noFill();
     beginShape();

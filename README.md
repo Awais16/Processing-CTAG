@@ -24,7 +24,15 @@ nextOnFlowerDuration : will not be active (attracted, aligned etc) for this dura
 
 ## Ant lanes
 
-left click to draw path which ants can follow.
-right click to add new ant.
+left and drag to draw the path which ants can follow. ( path is highlight in debug mode[hit space] )
+
+right click to add new ant with random max speed and force;
+
+###parameters
+some parameter explaination
+
+AntFollowing.pde > SMOOTH_DIST [to skip the points that are recorded while draging, two adjacent point will have atleast SMOOTH_DISTANCE between them in path]
+
+Vehicle.pde> PLOC_FACTOR  are the frame use to lookahead to accelerate towards that location on the path if ant is away from path.
 
  

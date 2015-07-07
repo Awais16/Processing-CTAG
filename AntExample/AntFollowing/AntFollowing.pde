@@ -11,9 +11,6 @@ boolean debug = false;
 // A path object (series of connected points)
 Path path;
 
-// Two vehicles
-Vehicle car1;
-Vehicle car2;
 ArrayList<Vehicle> ants;
 
 ArrayList<PImage> spriteImages;
@@ -38,7 +35,6 @@ void setup() {
   bg= loadImage("dirt2.jpg");
   
   // Each vehicle has different maxspeed and maxforce for demo purposes
-  //car1 = new Vehicle(new PVector(0, height/2), 2, 0.04);
   ants= new ArrayList<Vehicle>();
   ants.add(new Vehicle(new PVector(0, height/2), 2, 0.04));
   ants.add(new Vehicle(new PVector(0, height/2), 3, 0.1));
@@ -54,7 +50,6 @@ void draw() {
    ant.follow(path);
    ant.run();
    ant.borders(path); 
-   //ant.drawFootPrints(); not realisting
   }
 
   // Instructions
