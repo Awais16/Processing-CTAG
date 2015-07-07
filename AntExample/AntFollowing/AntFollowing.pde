@@ -54,6 +54,7 @@ void draw() {
    ant.follow(path);
    ant.run();
    ant.borders(path); 
+   //ant.drawFootPrints(); not realisting
   }
 
   // Instructions

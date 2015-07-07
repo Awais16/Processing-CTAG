@@ -19,6 +19,8 @@ class Vehicle {
   float maxspeed;    // Maximum speed
   
   float PLOC_FACTOR= 20; //frames ahead
+  ArrayList<PVector> history; // leaving ant footprints
+  float HISTORY_LIMIT= 40;
   
 
     // Constructor initialize all values
@@ -29,6 +31,7 @@ class Vehicle {
     maxforce = mf;
     acceleration = new PVector(0, 0);
     velocity = new PVector(maxspeed, 0);
+    history=new ArrayList<PVector>();
   }
 
   // Main "run" function
@@ -144,6 +147,15 @@ class Vehicle {
     location.add(velocity);
     // Reset accelertion to 0 each cycle
     acceleration.mult(0);
+    
+    //adding footprints
+    
+    if(int(random(1,3))==1){
+      history.add(location.get());
+      if (history.size() > HISTORY_LIMIT) {
+        history.remove(0);
+      }
+    }
   }
 
   void applyForce(PVector force) {
@@ -210,6 +222,27 @@ class Vehicle {
     image(spriteImages.get(spriteFrame), 0,0);
     
     popMatrix();
+  }
+  
+  void drawFootPrints(){
+    beginShape();
+    //stroke(255,255,255);
+    //strokeWeight(1);
+    noStroke();
+    //noFill();
+    fill(247,184,91);
+    int i=0;
+    while(i+5<(history.size()-5)) {
+      //if(int()==1){
+        
+        PVector v=history.get(i);
+        ellipse(v.x, v.y-10, 2,2);
+        ellipse(v.x, v.y+10, 2,2);
+      //}
+      i=i+5;
+    }
+    endShape();
+    
   }
   
 }
