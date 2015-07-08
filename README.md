@@ -34,5 +34,3 @@ some parameter explaination
 AntFollowing.pde > SMOOTH_DIST [to skip the points that are recorded while draging, two adjacent point will have atleast SMOOTH_DISTANCE between them in path]
 
 Vehicle.pde> PLOC_FACTOR  are the frame use to lookahead to accelerate towards that location on the path if ant is away from path.
-
- 

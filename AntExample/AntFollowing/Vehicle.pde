@@ -219,7 +219,12 @@ class Vehicle {
     imageMode(CENTER);
     //println(spriteFrame);
     spriteFrame = (spriteFrame+1) % (spriteImages.size());
-    image(spriteImages.get(spriteFrame), 0,0);
+    if(sprite2){
+      image(spriteImages2.get(spriteFrame), 0,0);
+    }else{
+      image(spriteImages.get(spriteFrame), 0,0);
+    }
+    
     
     popMatrix();
   }

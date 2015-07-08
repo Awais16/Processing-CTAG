@@ -7,13 +7,14 @@
 
 // Using this variable to decide whether to draw all the stuff
 boolean debug = false;
-
+boolean sprite2=false;
 // A path object (series of connected points)
 Path path;
 
 ArrayList<Vehicle> ants;
 
 ArrayList<PImage> spriteImages;
+ArrayList<PImage> spriteImages2;
 int spriteFrame=1;
 float SMOOTH_DIST=20.0;
 PImage bg;
@@ -28,9 +29,10 @@ void setup() {
   spriteImages.add(loadImage("Ant normal.png"));
   spriteImages.add(loadImage("Ant down.png"));
   
-//  spriteImages.add(loadImage("Ant2_1.png"));
-//  spriteImages.add(loadImage("Ant2_2.png"));
-//  spriteImages.add(loadImage("Ant2_3.png"));
+  spriteImages2= new ArrayList<PImage>();
+  spriteImages2.add(loadImage("Ant2_1.png"));
+  spriteImages2.add(loadImage("Ant2_2.png"));
+  spriteImages2.add(loadImage("Ant2_3.png"));
   
   bg= loadImage("dirt2.jpg");
   
@@ -54,7 +56,7 @@ void draw() {
 
   // Instructions
   fill(0);
-  text("Hit space bar to toggle debugging lines.\n Drag mouse to generate a new path.", 10, height-30);
+  text("Hit space bar to toggle debugging lines.\n Drag mouse to generate a new path.\n Hit \"A\" to change bug", 10, height-30);
 }
 
 void newPath() {
@@ -70,6 +72,12 @@ void newPath() {
 public void keyPressed() {
   if (key == ' ') {
     debug = !debug;
+  }else if(key=='a'){
+    if(sprite2){
+      sprite2=false;
+    }else{
+      sprite2=true;  
+    }
   }
 }
 
