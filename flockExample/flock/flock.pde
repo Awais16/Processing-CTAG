@@ -3,7 +3,7 @@ PImage bgImg,flower1,flower2,flower3;
 ArrayList<Flower> flowers;
 ArrayList<PImage> bSprite;
 ArrayList<PImage> bSprite2;
-int flockSize=50;
+int flockSize=80;
 
 
 float swt = 2.3;     //sep.mult(25.0f);
@@ -18,12 +18,12 @@ boolean scrollbar = false;
 
 
 void setup() {
-  size(800,600); //size of bgImage should of equal to this
+  size(1280,720); //size of bgImage should of equal to this
   
   setupScrollbars();
   
   flock = new Flock();
-  bgImg= loadImage("bg3.png");
+  bgImg= loadImage("bg720.png");
   flower1= loadImage("Flower03.png");
   flower2= loadImage("Flower04.png");
   flower3= loadImage("Flower05.png");

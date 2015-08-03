@@ -19,7 +19,7 @@ int spriteFrame=1;
 float SMOOTH_DIST=20.0;
 PImage bg;
 void setup() {
-  size(800, 600);
+  size(960, 540);
   // Call a function to generate new Path object
   newPath=null;
   newPath();
@@ -34,7 +34,7 @@ void setup() {
   spriteImages2.add(loadImage("Ant2_2.png"));
   spriteImages2.add(loadImage("Ant2_3.png"));
   
-  bg= loadImage("dirt2.jpg");
+  bg= loadImage("dirt2_540.jpg");
   
   // Each vehicle has different maxspeed and maxforce for demo purposes
   ants= new ArrayList<Vehicle>();
