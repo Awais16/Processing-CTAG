@@ -1,0 +1,494 @@
+<html>
+
+	<head>
+		<title>test html</title>
+	</head>
+	<script src="./../../processing.min.js"></script>
+	<body>
+		
+		<canvas id="pjs" width="1024" height="768" ></canvas>
+
+
+<script type="application/processing" data-processing-target="pjs">
+/* @pjs preload="dirt2_540.png,Ant up.png,Ant normal.png,Ant down.png,Ant2_1.png,Ant2_2.png,Ant2_3.png"; */
+
+
+
+// The Nature of Code
+// Daniel Shiffman
+// http://natureofcode.com
+
+// Path Following
+
+class Path {
+
+  // A Path is an arraylist of points (PVector objects)
+  ArrayList<PVector> points;
+  // A path has a radius, i.e how far is it ok for the boid to wander off
+  float radius;
+
+  Path() {
+    // Arbitrary radius of 20
+    radius = 15;
+    points = new ArrayList<PVector>();
+  }
+
+  // Add a point to the path
+  void addPoint(float x, float y) {
+    PVector point = new PVector(x, y);
+    points.add(point);
+  }
+  
+  PVector getStart() {
+     return points.get(0);
+  }
+
+  PVector getEnd() {
+     return points.get(points.size()-1);
+  }
+  
+  PVector get(int i){
+    PVector point=null;
+    if(i<points.size()){
+      point=points.get(i);
+    }
+    return point;
+  }
+  
+  int size(){
+    return points.size();
+  }
+  
+  PVector remove(int i){
+    PVector point=null;
+    if(i<points.size()){
+      point=points.remove(i);
+    }
+    return point;
+  }
+
+
+  // Draw the path
+  void display() {
+    // Draw thick line for radius
+    if(debug)
+      stroke(175);
+    else
+      stroke(255,255,255,20);
+    strokeWeight(radius*1.5);
+    noFill();
+    beginShape();
+    for (PVector v : points) {
+      vertex(v.x, v.y);
+    }
+    endShape();
+    // Draw thin line for center of path
+    if(debug)
+      stroke(0);
+    else
+      stroke(255,200,155,30);
+    strokeWeight(5);
+    noFill();
+    beginShape();
+    for (PVector v : points) {
+      vertex(v.x, v.y);
+    }
+    endShape();
+  }
+}
+
+
+// The Nature of Code
+// Daniel Shiffman
+// http://natureofcode.com
+
+// Path Following
+
+// Vehicle class
+
+
+
+class Vehicle {
+
+  // All the usual stuff
+  PVector location;
+  PVector velocity;
+  PVector acceleration;
+  float r;
+  float maxforce;    // Maximum steering force
+  float maxspeed;    // Maximum speed
+  
+  float PLOC_FACTOR= 20; //frames ahead
+  ArrayList<PVector> history; // leaving ant footprints
+  float HISTORY_LIMIT= 40;
+  
+
+    // Constructor initialize all values
+  Vehicle( PVector l, float ms, float mf) {
+    location = l.get();
+    r = 4.0;
+    maxspeed = ms;
+    maxforce = mf;
+    acceleration = new PVector(0, 0);
+    velocity = new PVector(maxspeed, 0);
+    history=new ArrayList<PVector>();
+  }
+
+  // Main "run" function
+  public void run() {
+    update();
+    display();
+  }
+
+
+  // This function implements Craig Reynolds' path following algorithm
+  // http://www.red3d.com/cwr/steer/PathFollow.html
+  void follow(Path p) {
+
+    // Predict location 50 (arbitrary choice) frames ahead
+    // This could be based on speed 
+    PVector predict = velocity.get();
+    predict.normalize();
+    predict.mult(PLOC_FACTOR);
+    PVector predictLoc = PVector.add(location, predict);
+
+    // Now we must find the normal to the path from the predicted location
+    // We look at the normal for each line segment and pick out the closest one
+
+    PVector normal = null;
+    PVector target = null;
+    float worldRecord = 1000000;  // Start with a very high record distance that can easily be beaten
+
+    // Loop through all points of the path
+    for (int i = 0; i < p.points.size()-1; i++) {
+
+      // Look at a line segment
+      PVector a = p.points.get(i);
+      PVector b = p.points.get(i+1);
+
+      // Get the normal point to that line
+      PVector normalPoint = getNormalPoint(predictLoc, a, b);
+      // This only works because we know our path goes from left to right
+      // We could have a more sophisticated test to tell if the point is in the line segment or not
+      //if (normalPoint.x < a.x || normalPoint.x > b.x) {
+        if (normalPoint.x < min(a.x,b.x) || normalPoint.x > max(a.x,b.x) || normalPoint.y < min(a.y,b.y) || normalPoint.y > max(a.y,b.y)) {
+        // This is something of a hacky solution, but if it's not within the line segment
+        // consider the normal to just be the end of the line segment (point b)
+        normalPoint = b.get();
+      }
+
+      // How far away are we from the path?
+      float distance = PVector.dist(predictLoc, normalPoint);
+      // Did we beat the record and find the closest line segment?
+      if (distance < worldRecord) {
+        worldRecord = distance;
+        // If so the target we want to steer towards is the normal
+        normal = normalPoint;
+
+        // Look at the direction of the line segment so we can seek a little bit ahead of the normal
+        PVector dir = PVector.sub(b, a);
+        dir.normalize();
+        // This is an oversimplification
+        // Should be based on distance to path & velocity
+        dir.mult(10);
+        target = normalPoint.get();
+        target.add(dir);
+      }
+    }
+
+    // Only if the distance is greater than the path's radius do we bother to steer
+    if (worldRecord > p.radius) {
+      seek(target);
+    }
+
+
+    // Draw the debugging stuff
+    if (debug) {
+      // Draw predicted future location
+      stroke(0);
+      fill(0);
+      line(location.x, location.y, predictLoc.x, predictLoc.y);
+      ellipse(predictLoc.x, predictLoc.y, 4, 4);
+
+      // Draw normal location
+      stroke(0);
+      fill(0);
+      ellipse(normal.x, normal.y, 4, 4);
+      // Draw actual target (red if steering towards it)
+      line(predictLoc.x, predictLoc.y, normal.x, normal.y);
+      if (worldRecord > p.radius) fill(255, 0, 0);
+      noStroke();
+      ellipse(target.x, target.y, 8, 8);
+    }
+  }
+
+
+  // A function to get the normal point from a point (p) to a line segment (a-b)
+  // This function could be optimized to make fewer new Vector objects
+  PVector getNormalPoint(PVector p, PVector a, PVector b) {
+    // Vector from a to p
+    PVector ap = PVector.sub(p, a);
+    // Vector from a to b
+    PVector ab = PVector.sub(b, a);
+    ab.normalize(); // Normalize the line
+    // Project vector "diff" onto line by using the dot product
+    ab.mult(ap.dot(ab));
+    PVector normalPoint = PVector.add(a, ab);
+    return normalPoint;
+  }
+
+
+  // Method to update location
+  void update() {
+    // Update velocity
+    velocity.add(acceleration);
+    // Limit speed
+    velocity.limit(maxspeed);
+    location.add(velocity);
+    // Reset accelertion to 0 each cycle
+    acceleration.mult(0);
+    
+    //adding footprints
+    
+    if(int(random(1,3))==1){
+      history.add(location.get());
+      if (history.size() > HISTORY_LIMIT) {
+        history.remove(0);
+      }
+    }
+  }
+
+  void applyForce(PVector force) {
+    // We could add mass here if we want A = F / M
+    acceleration.add(force);
+  }
+
+
+  // A method that calculates and applies a steering force towards a target
+  // STEER = DESIRED MINUS VELOCITY
+  void seek(PVector target) {
+    PVector desired = PVector.sub(target, location);  // A vector pointing from the location to the target
+
+    // If the magnitude of desired equals 0, skip out of here
+    // (We could optimize this to check if x and y are 0 to avoid mag() square root
+    if (desired.mag() == 0) return;
+
+    // Normalize desired and scale to maximum speed
+    desired.normalize();
+    desired.mult(maxspeed);
+    // Steering = Desired minus Velocity
+    PVector steer = PVector.sub(desired, velocity);
+    steer.limit(maxforce);  // Limit to maximum steering force
+    applyForce(steer);
+  }
+
+  void display() {
+    // Draw a triangle rotated in the direction of velocity
+    float theta = velocity.heading2D() + radians(90);
+    animate(theta);
+  }
+
+  // Wraparound
+  void borders(Path p) {
+    /*if (location.x > p.getEnd().x + r) {
+      location.x = p.getStart().x - r;
+      location.y = p.getStart().y + (location.y-p.getEnd().y);
+    }*/
+   
+    PVector predict = velocity.get();
+    predict.normalize();
+    predict.mult(20);
+    PVector predictLoc = PVector.add(location, predict);
+    
+    float d=PVector.dist(location,p.getEnd());
+    
+    if(d<PLOC_FACTOR){
+      //println("yes");
+      //exit();
+      location.x = p.getStart().x;
+      location.y = p.getStart().y;
+    }
+  }
+  
+  void animate(float theta){
+    
+    pushMatrix();
+    //translate and rotate to give direction to the image.
+    translate(location.x,location.y);
+    rotate(theta);
+    imageMode(CENTER);
+    //println(spriteFrame);
+    spriteFrame = (spriteFrame+1) % (spriteImages.size());
+    if(sprite2){
+      image(spriteImages2.get(spriteFrame), 0,0);
+    }else{
+      image(spriteImages.get(spriteFrame), 0,0);
+    }
+    
+    imageMode(CORNER);
+    popMatrix();
+  }
+  
+  void drawFootPrints(){
+    beginShape();
+    //stroke(255,255,255);
+    //strokeWeight(1);
+    noStroke();
+    //noFill();
+    fill(247,184,91);
+    int i=0;
+    while(i+5<(history.size()-5)) {
+      //if(int()==1){
+        
+        PVector v=history.get(i);
+        ellipse(v.x, v.y-10, 2,2);
+        ellipse(v.x, v.y+10, 2,2);
+      //}
+      i=i+5;
+    }
+    endShape();
+    
+  }
+  
+}
+
+
+
+
+// The Nature of Code
+// Daniel Shiffman
+// http://natureofcode.com
+
+// Path Following
+// Via Reynolds: // http://www.red3d.com/cwr/steer/PathFollow.html
+
+// Using this variable to decide whether to draw all the stuff
+boolean debug = false;
+boolean sprite2=false;
+// A path object (series of connected points)
+Path path;
+
+ArrayList<Vehicle> ants;
+
+ArrayList<PImage> spriteImages;
+ArrayList<PImage> spriteImages2;
+int spriteFrame=1;
+float SMOOTH_DIST=20.0;
+PImage bg;
+
+void setup() {
+  size(960, 540);
+  // Call a function to generate new Path object
+  newPath=null;
+  createNewPath();
+  
+  spriteImages= new ArrayList<PImage>();
+  spriteImages.add(loadImage("Ant up.png"));
+  spriteImages.add(loadImage("Ant normal.png"));
+  spriteImages.add(loadImage("Ant down.png"));
+  
+  spriteImages2= new ArrayList<PImage>();
+  spriteImages2.add(loadImage("Ant2_1.png"));
+  spriteImages2.add(loadImage("Ant2_2.png"));
+  spriteImages2.add(loadImage("Ant2_3.png"));
+  
+  bg= loadImage("dirt2_540.png");
+  
+  // Each vehicle has different maxspeed and maxforce for demo purposes
+  ants= new ArrayList<Vehicle>();
+  ants.add(new Vehicle(new PVector(0, height/2), 2, 0.04));
+  ants.add(new Vehicle(new PVector(0, height/2), 3, 0.1));
+}
+
+void draw() {
+  background(bg);
+  // Display the path
+  path.display();
+  // The boids follow the path
+  
+  for(Vehicle ant: ants){
+   ant.follow(path);
+   ant.run();
+   ant.borders(path); 
+  }
+
+  // Instructions
+  fill(0);
+  text("Hit space bar to toggle debugging lines.\n Drag mouse to generate a new path.\n Hit \"A\" to change bug", 10, height-30);
+}
+
+void createNewPath() {
+  // A path is a series of connected points
+  // A more sophisticated path might be a curve
+  path = new Path();
+  path.addPoint(-20, height/2);
+  path.addPoint(random(0, width/2), random(0, height));
+  path.addPoint(random(width/2, width), random(0, height));
+  path.addPoint(width+20, height/2);
+}
+
+public void keyPressed() {
+  if (key == ' ') {
+    debug = !debug;
+  }else if(key=='a'){
+    if(sprite2){
+      sprite2=false;
+    }else{
+      sprite2=true;  
+    }
+  }
+}
+
+//public boolean isNewPath;
+public Path newPath;
+
+public void mousePressed() {
+  
+  if (mouseButton == LEFT){
+    //draw path;
+    newPath= new Path();
+    newPath.addPoint(mouseX,mouseY);
+  }else{
+    //add ant
+    ants.add(new Vehicle(new PVector(0, height/2), random(0.5,5), random(0.05,0.20)));
+  }
+  
+}
+
+public void mouseDragged(){
+  if (mouseButton == LEFT){
+    if(newPath!=null){
+      newPath.addPoint(mouseX,mouseY);
+    }
+  }
+}
+
+public void mouseReleased(){
+    if(mouseButton == LEFT && newPath!=null){
+      newPath.addPoint(mouseX,mouseY);
+      // smooth it up, remove the points that are too close;
+      PVector lastPoint=newPath.getStart();
+      //newPath.addPoint(lastPoint.x,lastPoint.y); //for closed path
+      int i=1;
+      while(i<newPath.size()){
+        PVector nextPoint= newPath.get(i);
+       float distance= dist(lastPoint.x,lastPoint.y,nextPoint.x,nextPoint.y);
+        if(distance<SMOOTH_DIST){
+         newPath.remove(i);
+        }else{
+          lastPoint=newPath.get(i);
+          i++;
+        }
+      }
+      path=newPath;
+      newPath=null;
+    }
+}
+
+
+ </script>
+
+
+
+	</body>
+</html>
