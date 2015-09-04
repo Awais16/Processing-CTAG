@@ -106,7 +106,7 @@ class Plugin_Name_Public {
 
 
 	public function handleFlockShortCode(){
-		echo "Birds flock here";
+		require_once("partials/flock.html");
 	}
 
 }

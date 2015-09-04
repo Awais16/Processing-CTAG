@@ -1,10 +1,30 @@
 <div>
-  <canvas id="pjs" width="1024" height="768" ></canvas>
+  <canvas id="pjs" width="800" height="600" ></canvas>
 
 
 <script type="application/processing" data-processing-target="pjs">
-/* @pjs preload="bg2.jpg,Flower03.png,Flower04.png, Flower05.png, Bee up.png, Bee normal.png, Bee down.png, Bee stop.png, yBee up.png, yBee normal.png, yBee down.png"; */
+/* @pjs preload="<?php 
+echo CTAG_BASE_URL.'public\images\bg2.jpg'.',';
+echo CTAG_BASE_URL.'public\images\Flower03.png'.',';
+echo CTAG_BASE_URL.'public\images\Flower04.png'.',';
+echo CTAG_BASE_URL.'public\images\Flower05.png'.',';
+echo CTAG_BASE_URL.'public\images\Bee up.png'.',';
+echo CTAG_BASE_URL.'public\images\Bee normal.png'.',';
+echo CTAG_BASE_URL.'public\images\Bee down.png'.',';
+echo CTAG_BASE_URL.'public\images\Bee stop.png'.',';
+echo CTAG_BASE_URL.'public\images\yBee up.png'.',';
+echo CTAG_BASE_URL.'public\images\yBee normal.png'.',';
+echo CTAG_BASE_URL.'public\images\yBee down.png';
+?>
+"*/
 
+
+
+
+
+
+
+var CTAG_PATH=<?php echo '"'.CTAG_BASE_URL."public/images/".'"';?>;
 
 Flock flock;
 PImage bgImg,flower1,flower2,flower3;
@@ -35,21 +55,21 @@ void setup() {
   setupScrollbars();
   //background(#c9c9c9);
   flock = new Flock();
-  bgImg= loadImage("bg2.jpg");
-  flower1= loadImage("Flower03.png");
-  flower2= loadImage("Flower04.png");
-  flower3= loadImage("Flower05.png");
+  bgImg= loadImage(CTAG_PATH+"bg2.jpg");
+  flower1= loadImage(CTAG_PATH+"Flower03.png");
+  flower2= loadImage(CTAG_PATH+"Flower04.png");
+  flower3= loadImage(CTAG_PATH+"Flower05.png");
   
   bSprite=new ArrayList<PImage>();
-  bSprite.add(loadImage("Bee up.png"));
-  bSprite.add(loadImage("Bee normal.png"));
-  bSprite.add(loadImage("Bee down.png"));
-  bSprite.add(loadImage("Bee stop.png"));
+  bSprite.add(loadImage(CTAG_PATH+"Bee up.png"));
+  bSprite.add(loadImage(CTAG_PATH+"Bee normal.png"));
+  bSprite.add(loadImage(CTAG_PATH+"Bee down.png"));
+  bSprite.add(loadImage(CTAG_PATH+"Bee stop.png"));
   
   bSprite2=new ArrayList<PImage>();
-  bSprite2.add(loadImage("yBee up.png"));
-  bSprite2.add(loadImage("yBee normal.png"));
-  bSprite2.add(loadImage("yBee down.png"));
+  bSprite2.add(loadImage(CTAG_PATH+"yBee up.png"));
+  bSprite2.add(loadImage(CTAG_PATH+"yBee normal.png"));
+  bSprite2.add(loadImage(CTAG_PATH+"yBee down.png"));
   
   flowers=new ArrayList<Flower>(); //list of add flowers
  
