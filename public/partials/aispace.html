@@ -1,0 +1,167 @@
+
+<div style="overflow:auto;position: absolute; max-width:800px; max-height:500px;">
+    <div style="min-width:5000px; min-height:5000px; background:black;" id="spaceDiv">
+    </div>
+</div>
+
+<p id="demo"></p>
+
+
+<script>
+    //check for ES6
+    function check()
+    {
+        "use strict";
+
+        if (typeof Symbol == "undefined") return false;
+        try {
+            var supportEs6 = true;
+            try { eval('"use strict"; class foo {}'); } catch (e) { supportEs6 = false; }
+
+            if(!supportEs6){
+                return false;
+            }
+
+        } catch (e) { return false; }
+
+        return true;
+    }
+
+    $(document).ready(function()
+    {
+
+
+        if (check())
+        {
+/*            var Ent = document.createElement('script');
+            Ent.src = "js/Entities.js";
+            document.head.appendChild(Ent);
+
+            var Mov = document.createElement('script');
+            Mov.src = "js/Movement.js";
+            document.head.appendChild(Mov);
+
+            var Sen = document.createElement('script');
+            Sen.src = "js/Sensor.js";
+            document.head.appendChild(Sen);*/
+
+/*            var Art = document.createElement('script');
+            Art.src = "js/ArtificialIntelligence.js";
+            document.head.appendChild(Art);*/
+
+            //create star background
+            for (var i = 0; i < 2000; i++)
+            {
+                var x = Math.floor((Math.random() * $("#spaceDiv").width()) + 1);
+                var y = Math.floor((Math.random() * $("#spaceDiv").height()) + 1);
+                var size = Math.floor((Math.random() * 3) + 1);
+                var div = document.createElement('div');
+                $(div).css("position", "absolute");
+                $(div).css("width", size + "px");
+                $(div).css("height", size + "px");
+                $(div).css("left", x + "px");
+                $(div).css("top", y + "px");
+                $(div).css("background", "white");
+                $(div).appendTo($("#spaceDiv"));
+            };
+
+            var handleInt = new HandleObjects($("#spaceDiv").width(), $("#spaceDiv").height());
+
+            //create asteroids
+            for (var i = 0; i < 150; i++)
+            {
+                var x = Math.floor((Math.random() * $("#spaceDiv").width()) + 1);
+                var y = Math.floor((Math.random() * $("#spaceDiv").height()) + 1);
+                var size = Math.floor((Math.random() * 50) + 10);
+                var div = document.createElement('div');
+                $(div).css("position", "absolute");
+                $(div).css("width", size + "px");
+                $(div).css("height", size + "px");
+                $(div).css("left", x + "px");
+                $(div).css("top", y + "px");
+                $(div).css("background", "green");
+                $(div).appendTo($("#spaceDiv"));
+                handleInt.AddAsteroid(new Asteroid(i, new Rect(x, y, size, size), size*1000000));
+            };
+
+
+
+            //create cargo ships
+            for (var i = 0; i < 40; i++)
+            {
+                var x = Math.floor((Math.random() * $("#spaceDiv").width()) + 1);
+                var y = Math.floor((Math.random() * $("#spaceDiv").height()) + 1);
+                var size = 30;
+                var div = document.createElement('div');
+                $(div).css("position", "absolute");
+                $(div).css("width", size + "px");
+                $(div).css("height", size + "px");
+                $(div).css("left", x + "px");
+                $(div).css("top", y + "px");
+                $(div).css("background", "blue");
+                $(div).attr("id","cargoShip" + i);
+                $(div).appendTo($("#spaceDiv"));
+                //$(div).tooltip();
+
+                handleInt.AddCargoShip(0, 2000, i, new Rect(x, y, size, size), "#0000FF", handleInt)
+
+            };
+
+            //create pirate ships
+            for (var i = 0; i < 20; i++)
+            {
+                var x = Math.floor((Math.random() * $("#spaceDiv").width()) + 1);
+                var y = Math.floor((Math.random() * $("#spaceDiv").height()) + 1);
+                var size = 20;
+                var div = document.createElement('div');
+                $(div).css("position", "absolute");
+                $(div).css("width", size + "px");
+                $(div).css("height", size + "px");
+                $(div).css("left", x + "px");
+                $(div).css("top", y + "px");
+                $(div).css("background", "red");
+                $(div).attr("id","pirateShip" + i);
+                $(div).appendTo($("#spaceDiv"));
+                //$(div).tooltip();
+
+                handleInt.AddPirateShip(0, 2000, i, new Rect(x, y, size, size), "#0000FF", handleInt)
+
+            };
+
+
+
+            setInterval(function()
+            {
+                handleInt.ComputeNextStep();
+                var cargoShips = handleInt.GetAllCargoShips();
+
+                cargoShips.forEach(function (element, index)
+                {
+                    $('#cargoShip' + element.GetId()).css("left", element.GetBodyRect().GetX() + "px");
+                    $('#cargoShip' + element.GetId()).css("top", element.GetBodyRect().GetY() + "px");
+                    $('#cargoShip' + element.GetId()).prop('title', element.GetAiActivity());
+                    //$('#ship' + element.GetId()).tooltip();
+                });
+
+                var pirateShips = handleInt.GetAllPirateShips();
+
+                pirateShips.forEach(function (element, index)
+                {
+                    $('#pirateShip' + element.GetId()).css("left", element.GetBodyRect().GetX() + "px");
+                    $('#pirateShip' + element.GetId()).css("top", element.GetBodyRect().GetY() + "px");
+                    var masterString = (element.IsMaster()) ? '-=MasterShip=-\n' : '';
+                    $('#pirateShip' + element.GetId()).prop('title', masterString + element.GetAiActivity() + '\nx: ' + Math.round(element.GetCoordinateCenter().GetX())  + '\ny: ' + Math.round(element.GetCoordinateCenter().GetY()));
+                });
+
+                $( document ).tooltip();
+            }, 50);
+        } else
+        {
+            $("#spaceDiv").text('Not supported by your browser');
+            $("#spaceDiv").css("textcolor", "red");
+            //Alert('Not supported from your browser');
+        }
+
+
+    });
+</script>

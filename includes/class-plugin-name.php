@@ -173,6 +173,7 @@ class Plugin_Name {
 
 		$this->loader->add_shortcode("CTAG-Ants",$plugin_public,'handleAntsShortCode');
 		$this->loader->add_shortcode("CTAG-Flock",$plugin_public,'handleFlockShortCode');
+		$this->loader->add_shortcode("CTAG-KaiSpace",$plugin_public,'handleKaiSpaceShortCode');
 
 	}
 

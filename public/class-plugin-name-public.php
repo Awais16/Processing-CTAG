@@ -74,6 +74,7 @@ class Plugin_Name_Public {
 		 */
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/plugin-name-public.css', array(), $this->version, 'all' );
+		wp_enqueue_style( "jquery-ui", plugin_dir_url( __FILE__ ) . 'css/jquery-ui.css', array(), $this->version, 'all' );
 
 	}
 
@@ -97,6 +98,14 @@ class Plugin_Name_Public {
 		 */
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/processing.min.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( "jquery-ui-js", plugin_dir_url( __FILE__ ) . 'js/jquery-1.11.3.min.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( "kai-entities", plugin_dir_url( __FILE__ ) . 'js/Entities.js', array('jquery' ), $this->version, false );
+		wp_enqueue_script( "kai-movement", plugin_dir_url( __FILE__ ) . 'js/Movement.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( "kai-sensor", plugin_dir_url( __FILE__ ) . 'js/Sensor.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( "kai-artificaialIntelligence", plugin_dir_url( __FILE__ ) . 'js/ArtificialIntelligence.js', array( 'jquery' ), $this->version, false );
+
+
+
 
 	}
 
@@ -107,6 +116,10 @@ class Plugin_Name_Public {
 
 	public function handleFlockShortCode(){
 		require_once("partials/flock.html");
+	}
+
+	public function handleKaiSpaceShortCode(){
+		require_once("partials/aispace.html");
 	}
 
 }
