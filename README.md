@@ -1,5 +1,6 @@
 # Processing-CTAG
 Processing flocking example for CTAG video
+Demo: http://www.creative-technologies.de/flock/
 
 ## Bee Flocking
 Usually Bees don't flock like birds but this can be used to understand the agent. This visualization is based on flocking example by Daniel Shiffman. Every bee in formation flock together with three main forces effecting them
